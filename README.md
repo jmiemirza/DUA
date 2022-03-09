@@ -21,7 +21,7 @@ Part of the results in the paper are obtained by using [AugMix](https://arxiv.or
 To reproduce these results download [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
 
 
-###Results Cifar10C (Level-5 Severity)
+### Results Cifar10C (Level-5 Severity)
 |                                                            | data samples used| mean error | gauss_noise | shot_noise | impulse_noise | defocus_blur | glass_blur | motion_blur | zoom_blur | snow | frost |  fog | brightness | contrast | elastic_trans | pixelate | jpeg |
 | ---------------------------------------------------------- | ---:|---: | ----------: | ---------: | ------------: | -----------: | ---------: | ----------: | --------: | ---: | ----: | ---: | ---------: | -------: | ------------: | -------: | ---: |
 | source        |10000 | 18.3|28.8| 22.9|26.2|9.5| 20.6|10.6|9.3|14.2|15.3|17.5|7.6          |20.9|14.7|41.3|14.7|
@@ -33,7 +33,7 @@ To reproduce these results download [WRN-40-2 Checkpoint](https://drive.google.c
 python dua.py --model wrn --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path PATH_FOR_DOWNLOADED_CHECKPOINT
 ```
 
-##ResNet-26
+## ResNet-26
 We also use ResNet-26 for comparison with some baselines. To reproduce these results, please download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/1ohrhBGQ3U4aAYI3PEzNMZ3ouhuf8jehM/view?usp=sharing).
 
 |                                                            | data samples used| mean error | gauss_noise | shot_noise | impulse_noise | defocus_blur | glass_blur | motion_blur | zoom_blur | snow | frost |  fog | brightness | contrast | elastic_trans | pixelate | jpeg |
@@ -47,12 +47,10 @@ We also use ResNet-26 for comparison with some baselines. To reproduce these res
 ```python
 python dua.py --model res --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path PATH_FOR_DOWNLOADED_CHECKPOINT
 ```
-###Results Cifar10C (Level-5 Severity)
+### Results Cifar10C (Level-5 Severity)
 ## Correspondence
 
 Please contact Muhammad Jehanzeb Mirza at muhammad.mirza AT icg.tugraz.at.
-##Acknowledgments
-Part of our code is built upon the public code of [TTT](https://github.com/yueatsprograms/ttt_cifar_release).
 
 ```bibtex
 @inproceedings{mirza2021dua,
@@ -62,6 +60,8 @@ Part of our code is built upon the public code of [TTT](https://github.com/yueat
   year={2022}
 }
 ```
+## Acknowledgments
+Part of our code is built upon the public code of [TTT](https://github.com/yueatsprograms/ttt_cifar_release).
 [comment]: <> (Clone the project)
 
 [comment]: <> (```bash)
