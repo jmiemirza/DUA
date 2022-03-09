@@ -54,7 +54,7 @@ Please contact Muhammad Jehanzeb Mirza at muhammad.mirza AT icg.tugraz.at.
 ```bibtex
 @inproceedings{mirza2021dua,
   title={The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization},
-  author={Mirza, M Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
+  author={Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
   booktitle={IEEE/CVF Conference for Computer Vision and Pattern Recognition},
   year={2022}
 }
