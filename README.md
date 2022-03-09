@@ -6,9 +6,7 @@ This is the official repository for our paper: [The Norm Must Go On: Dynamic Uns
 DUA is an extremely simple method which adapts the (1st and 2nd order) stastics of the Batch Normalization layer in an online manner to adapt to the out of distribution test data at test time. DUA is extremely computation
 and data efficient. DUA requires less than 1% of data from the target domain and no back propagation to achieve competitve (and often state-of-the-art) results when compared to strong baselines.
 
-Currently we provide example code for reproducing Cifar-10C experiments from our paper. 
-
-Please check soon for more code.
+Currently we provide example code for reproducing Cifar-10C experiments from our paper.
 
 
 [comment]: <> (Note: This is a minimal working example for reproducing Cifar-10C results. We will later add more code for other experiments as well. Stay tuned. . . )
