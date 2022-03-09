@@ -32,7 +32,7 @@ python dua.py --model wrn --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path
 ```
 
 ## ResNet-26
-We also use ResNet-26 for comparison with some baselines. To reproduce these results, please download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/1ohrhBGQ3U4aAYI3PEzNMZ3ouhuf8jehM/view?usp=sharing).
+We also use ResNet-26 for comparison with some baselines. To reproduce these results, please download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
 
 ### ResNet-26 - Results Cifar10C (Level-5 Severity)
 
