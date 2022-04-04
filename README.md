@@ -3,8 +3,11 @@
 
 This is the official repository for our paper: [The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization](https://arxiv.org/abs/2112.00463)
 
-DUA is an extremely simple method which adapts the (1st and 2nd order) stastics of the Batch Normalization layer in an online manner to adapt to the out of distribution test data at test time. DUA is extremely computation
-and data efficient. DUA requires less than 1% of data from the target domain and no back propagation to achieve competitve (and often state-of-the-art) results when compared to strong baselines.
+DUA is an extremely simple method which only adapts the (1st and 2nd order) statistics of the Batch Normalization layer 
+in an online manner to adapt to the out-of-distribution test data at test-time. Adapting only the statistics for 
+Unsupervised Domain Adaptation makes DUA extremely fast and computation efficient. Moreover, 
+DUA requires less than 1% of data from the target domain and no back propagation to achieve 
+competitive (and often state-of-the-art) results when compared to strong baselines.
 
 Currently we provide example code for reproducing Cifar-10C experiments from our paper.
 
@@ -55,61 +58,9 @@ Please contact Muhammad Jehanzeb Mirza at muhammad.mirza AT icg.tugraz.at.
 @inproceedings{mirza2021dua,
   title={The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization},
   author={Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
-  booktitle={IEEE/CVF Conference for Computer Vision and Pattern Recognition},
+  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition},
   year={2022}
 }
 ```
 ## Acknowledgments
 Part of our code is built upon the public code of [TTT](https://github.com/yueatsprograms/ttt_cifar_release).
-
-
-[comment]: <> (Clone the project)
-
-[comment]: <> (```bash)
-
-[comment]: <> (  git clone https://github.com/jmiemirza/DUA.git)
-
-[comment]: <> (```)
-
-[comment]: <> (Go to the project directory)
-
-[comment]: <> (```bash)
-
-[comment]: <> (  cd DUA)
-
-[comment]: <> (```)
-
-[comment]: <> (Install dependencies)
-
-[comment]: <> (```bash)
-
-[comment]: <> (  pip install requirement.txt)
-
-[comment]: <> (```)
-
-[comment]: <> (Train a ResNet-26)
-
-[comment]: <> (```bash)
-
-[comment]: <> (  python main.py --train true --outf results/bn_adapt/)
-
-[comment]: <> (```)
-
-[comment]: <> (Test on Corruptions)
-
-[comment]: <> (```bash)
-
-[comment]: <> (   python main.py --test_c true --outf results/bn_adapt/)
-
-[comment]: <> (```)
-
-[comment]: <> (Run DUA )
-
-[comment]: <> (```bash)
-
-[comment]: <> (  python main.py --dua true --outf results/bn_adapt/ --num_samples 5)
-
-[comment]: <> (```)
-
-[comment]: <> (Set number of *'num_samples'* argument to adapt on more samples. In the paper we always set this number to 200. Results after adaptation on all the corruptions would be saved in the directory specified for the *'outf'* argument. )
-
