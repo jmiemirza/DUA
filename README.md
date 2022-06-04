@@ -35,7 +35,7 @@ python dua.py --model wrn --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path
 ```
 
 ## ResNet-26
-We also use ResNet-26 for comparison with some baselines. To reproduce these results, please download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
+We also use ResNet-26 for comparison with some baselines. To run these experiments, download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
 
 ### ResNet-26 - Results Cifar10C (Level-5 Severity)
 
@@ -50,13 +50,10 @@ We also use ResNet-26 for comparison with some baselines. To reproduce these res
 ```python
 python dua.py --model res --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path PATH_FOR_DOWNLOADED_CHECKPOINT
 ```
-## Correspondence
-
-Please contact Muhammad Jehanzeb Mirza at muhammad.mirza AT icg.tugraz.at.
-
+To cite us: 
 ```bibtex
-@inproceedings{mirza2021dua,
-  title={The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization},
+@inproceedings{mirza2022dua,
+  title={{The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization}},
   author={Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
   booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition},
   year={2022}
