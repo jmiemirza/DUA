@@ -9,25 +9,24 @@ Unsupervised Domain Adaptation makes DUA extremely fast and computation efficien
 DUA requires less than 1% of data from the target domain and no back propagation to achieve 
 competitive (and often state-of-the-art) results when compared to strong baselines.
 
-Currently we provide example code for reproducing Cifar-10C experiments from our paper.
+Currently we provide example code for Cifar-10C experiments from our paper.
 
 
-[comment]: <> (Note: This is a minimal working example for reproducing Cifar-10C results. We will later add more code for other experiments as well. Stay tuned. . . )
 ## Dataset
 
 Download the [Cifar-10C dataset](https://zenodo.org/record/2535967).
 
 ## WRN-40-2
 Part of the results in the paper are obtained by using [AugMix](https://arxiv.org/abs/1912.02781) WRN-40-2 from the [Robust Bench](https://robustbench.github.io/).
-To reproduce these results download [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
+For running this experiments first download the [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
 
 
 ### WRN - Results Cifar10C (Level-5 Severity)
 |                                                            | data samples used| mean error | gauss_noise | shot_noise | impulse_noise | defocus_blur | glass_blur | motion_blur | zoom_blur | snow | frost |  fog | brightness | contrast | elastic_trans | pixelate | jpeg |
 | ---------------------------------------------------------- | ---:|---: | ----------: | ---------: | ------------: | -----------: | ---------: | ----------: | --------: | ---: | ----: | ---: | ---------: | -------: | ------------: | -------: | ---: |
-| source        |10000 | 18.3|28.8| 22.9|26.2|9.5| 20.6|10.6|9.3|14.2|15.3|17.5|7.6          |20.9|14.7|41.3|14.7|
-| tent           |10000 | 12.3 | 15.8|  13.5|18.7|8.1|18.7|9.1|8.0|10.3|10.8|11.7| 6.7|11.6| 14.1|11.7|15.2|
-| dua          |80 |12.1|15.4|13.4|17.3|8.0|18.0|9.1|7.7|10.8|10.8|12.1|6.6|10.9|13.6|13.0|14.3|
+| source        |10000 |18.3|28.8| 22.9|26.2|9.5| 20.6|10.6|9.3|14.2|15.3|17.5|7.6|20.9|14.7|41.3|14.7|
+| tent           |10000 |12.3|15.8|13.5|18.7|8.1|18.7|9.1|8.0|10.3|10.8|11.7|6.7|11.6|14.1|11.7|15.2|
+| dua          |80|12.1|15.4|13.4|17.3|8.0|18.0|9.1|7.7|10.8|10.8|12.1|6.6|10.9|13.6|13.0|14.3|
 
 **Usage**:
 ```python
@@ -35,7 +34,7 @@ python dua.py --model wrn --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path
 ```
 
 ## ResNet-26
-We also use ResNet-26 for comparison with some baselines. To reproduce these results, please download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
+We also use ResNet-26 for comparison with some baselines. To run this experiment, download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
 
 ### ResNet-26 - Results Cifar10C (Level-5 Severity)
 
@@ -50,13 +49,11 @@ We also use ResNet-26 for comparison with some baselines. To reproduce these res
 ```python
 python dua.py --model res --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path PATH_FOR_DOWNLOADED_CHECKPOINT
 ```
-## Correspondence
 
-Please contact Muhammad Jehanzeb Mirza at muhammad.mirza AT icg.tugraz.at.
-
+To cite us: 
 ```bibtex
-@inproceedings{mirza2021dua,
-  title={The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization},
+@inproceedings{mirza2022dua,
+  title={{The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization}},
   author={Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
   booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition},
   year={2022}
