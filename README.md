@@ -18,7 +18,7 @@ Download the [Cifar-10C dataset](https://zenodo.org/record/2535967).
 
 ## WRN-40-2
 Part of the results in the paper are obtained by using [AugMix](https://arxiv.org/abs/1912.02781) WRN-40-2 from the [Robust Bench](https://robustbench.github.io/).
-For running this experiments first download the [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
+For running this experiment first download the [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
 
 
 ### WRN - Results Cifar10C (Level-5 Severity)
