@@ -1,7 +1,7 @@
 
 # DUA: Dynamic Unsupervised Adaptation (CVPR 2022)
 
-This is the official repository for our paper: [The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization](https://arxiv.org/abs/2112.00463)
+This is the official repository for our paper: [The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization](https://openaccess.thecvf.com/content/CVPR2022/papers/Mirza_The_Norm_Must_Go_On_Dynamic_Unsupervised_Domain_Adaptation_by_CVPR_2022_paper.pdf)
 
 DUA is an extremely simple method which only adapts the (1st and 2nd order) statistics of the Batch Normalization layer 
 in an online manner to adapt to the out-of-distribution test data at test-time. Adapting only the statistics for 
@@ -51,12 +51,23 @@ python dua.py --model res --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path
 ```
 To cite us: 
 ```bibtex
-@inproceedings{mirza2022dua,
-  title={{The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization}},
-  author={Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
-  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  year={2022}
+@InProceedings{mirza2022dua,
+    author    = {Mirza, M. Jehanzeb and Micorek, Jakub and Possegger, Horst and Bischof, Horst},
+    title     = {The Norm Must Go On: Dynamic Unsupervised Domain Adaptation by Normalization},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year      = {2022}
 }
 ```
+
+Also read [DISC](https://openaccess.thecvf.com/content/CVPR2022W/V4AS/papers/Mirza_An_Efficient_Domain-Incremental_Learning_Approach_To_Drive_in_All_Weather_CVPRW_2022_paper.pdf), an extension of DUA - accepted at CVPR workshops. 
+```bibtex
+@InProceedings{mirza2022disc,
+    author    = {Mirza, M. Jehanzeb and Masana, Marc and Possegger, Horst and Bischof, Horst},
+    title     = {An Efficient Domain-Incremental Learning Approach To Drive in All Weather Conditions},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+    year      = {2022}
+}
+```
+
 ## Acknowledgments
 Part of our code is built upon the public code of [TTT](https://github.com/yueatsprograms/ttt_cifar_release).
