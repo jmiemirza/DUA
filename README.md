@@ -34,11 +34,7 @@ python dua.py --model wrn --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path
 ```
 
 ## ResNet-26
-<<<<<<< HEAD
-We also use ResNet-26 for comparison with some baselines. To run these experiments, download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
-=======
 We also use ResNet-26 for comparison with some baselines. To run this experiment, download the [ResNet-26 Checkpoint](https://drive.google.com/file/d/12I_4qlChWMeigej3KcCtU0JyGI69tOxo/view?usp=sharing).
->>>>>>> 5cdf5bfa77fc29ad543505b86ad7f6fd9554c6aa
 
 ### ResNet-26 - Results Cifar10C (Level-5 Severity)
 
@@ -53,10 +49,6 @@ We also use ResNet-26 for comparison with some baselines. To run this experiment
 ```python
 python dua.py --model res --dataroot ROOT_PATH_FOR_CIFAR_10C_DATASET --ckpt_path PATH_FOR_DOWNLOADED_CHECKPOINT
 ```
-<<<<<<< HEAD
-=======
-
->>>>>>> 5cdf5bfa77fc29ad543505b86ad7f6fd9554c6aa
 To cite us: 
 ```bibtex
 @inproceedings{mirza2022dua,
