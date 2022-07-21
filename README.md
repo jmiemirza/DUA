@@ -9,6 +9,8 @@ Unsupervised Domain Adaptation makes DUA extremely fast and computation efficien
 DUA requires less than 1% of data from the target domain and no back propagation to achieve 
 competitive (and often state-of-the-art) results when compared to strong baselines.
 
+Short explanatory video about DUA is hosted [here](https://www.youtube.com/watch?v=fTe0Aqs-t7E)
+
 Currently we provide example code for Cifar-10C experiments from our paper.
 
 
