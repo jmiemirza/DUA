@@ -11,7 +11,7 @@ import methods
 import config
 from init import init_net, init_settings, initial_checks, set_paths
 from utils.results_manager import ResultsManager
-from utils.utils import timedelta_to_str
+from utils.utils import timedelta_to_str, setup_log_folder
 
 
 def main(args):
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt_path', default='path/to/checkpoint.pt')
     parser.add_argument('--dataset', default='cifar10', choices=['cifar10', 'kitti', 'imagenet-mini', 'imagenet'])
     parser.add_argument('--model', default=None, type=str, choices=['wrn', 'res26', 'res18', 'yolov3'])
-    parser.add_argument('--logfile', default='log.txt', type=str)
+    parser.add_argument('--logfolder', default='logs', type=str)
 
     # General run settings
     parser.add_argument('--tasks', default=[], type=str, nargs='*',
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                         help='List of methods to run')
 
     # DUA/DISC adaption
-    parser.add_argument('--num_samples', default=50, type=int)
+    parser.add_argument('--num_samples', default=80, type=int)
     parser.add_argument('--decay_factor', default=0.94, type=float)
     parser.add_argument('--min_mom', default=0.005, type=float)
     parser.add_argument('--no_disc_adaption', action='store_true',
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--cfg', type=str, default='', help='model.yaml path')
     parser.add_argument('--img_size', nargs='+', type=int, default=[640, 640], help='[train, test] image sizes')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
-    parser.add_argument('--device', default='3', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--device', default='1', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--adam', action='store_true', help='use torch.optim.Adam() optimizer')
     parser.add_argument('--start_disjoint_offline_from_initial', action='store_true',
                         help='start offline disjoint training from checkpoint trained on initial task')
@@ -176,9 +176,12 @@ if __name__ == '__main__':
                         help='Generate YOLO style labels from KITTI labels, given original KITTI root dir')
 
     args: Namespace = parser.parse_args()
+    setup_log_folder(args)
 
     config.LOGGER_CFG['handlers']['file_handler']['filename'] = args.logfile
+
     logging.config.dictConfig(config.LOGGER_CFG)
+
     log = logging.getLogger('MAIN')
 
     main(args)

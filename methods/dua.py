@@ -6,7 +6,7 @@ from utils.testing_yolov3 import test as test_yolo
 from utils.torch_utils import select_device
 from utils.utils import make_dirs
 from utils.results_manager import ResultsManager
-
+from init import init_net
 log = logging.getLogger('MAIN.DUA')
 
 
@@ -30,8 +30,8 @@ def dua(args, net, save_bn_stats=False, use_training_data=False, save_fname=None
             transforms.ToTensor(),
             transforms.Normalize(*NORM)
         ])
-
-    ckpt = torch.load(args.ckpt_path)
+    if not args.dataset == 'imagenet':
+        ckpt = torch.load(args.ckpt_path)
     decay_factor = args.decay_factor
     min_momentum_constant = args.min_mom
     no_imp = 0
@@ -45,7 +45,11 @@ def dua(args, net, save_bn_stats=False, use_training_data=False, save_fname=None
         mom_pre = 0.1
         results = []
         log.info(f'Task - {args.task} :::: Level - {args.severity}')
-        net.load_state_dict(ckpt)
+        if not args.dataset == 'imagenet':
+            net.load_state_dict(ckpt)
+        else:
+            init_net(args)
+
         net.eval()
         if use_training_data:
             train_loader = get_loader(args, split='train')

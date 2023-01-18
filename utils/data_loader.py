@@ -108,6 +108,7 @@ def get_dataset(args, split=None, pad=0.0, aug=False, rect=False, joint=False):
 
     elif args.dataset in ['imagenet', 'imagenet-mini']:
         transform = tr_transforms_imgnet if split == 'train' else te_transforms_imgnet
+
         ds = ImgNet(args.dataroot, split, args.task, args.severity, transform)
         if split != 'val':
             # train and test split are being created from the train set

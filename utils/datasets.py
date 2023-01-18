@@ -34,14 +34,14 @@ class ImgNet(ImageFolder):
     initial_dir = ''
 
     def __init__(self, root, split, task, severity, transform, **kwargs):
-        split_dir = 'val' if split == 'val' else 'train'
+        split_dir = 'val' if split == 'test' else 'train'
         if task == 'initial':
-            root = os.path.join(root, self.initial_dir, split_dir)
+            root = os.path.join(root, self.initial_dir)
         else:
             root = os.path.join(root, self.initial_dir + '-c', split_dir, task,
                                 str(severity))
+        root = '/media/mirza/Data/Downloads/imagenet_c/'
         super().__init__(root, transform, **kwargs)
-
 
     def get_image_from_idx(self, idx: int = 0):
         return Image.open(self.imgs[idx][0])
@@ -54,6 +54,7 @@ class CIFAR(vision.VisionDataset):
         and expected to be filtered for an appropriate subset by the creator.
     """
     corruptions_dir = 'CIFAR-10-C'
+
     def __init__(self, root: str, task, split='train', transform=None,
                  target_transform=None, severity=1):
         super().__init__(root, transform=transform,
@@ -72,11 +73,9 @@ class CIFAR(vision.VisionDataset):
         start = self.num_samples * (severity - 1)
         end = self.num_samples * severity
         targets_path = os.path.join(self.root, self.corruptions_dir, split_dir, 'labels.npy')
-        self.targets = np.load(targets_path)[start : end]
+        self.targets = np.load(targets_path)[start: end]
         f_path = os.path.join(self.root, self.corruptions_dir, split_dir, f'{task}.npy')
-        self.data = np.load(f_path, mmap_mode='c')[start : end]
-
-
+        self.data = np.load(f_path, mmap_mode='c')[start: end]
 
     def _load_initial_task(self, split):
         base_folder = "cifar-10-batches-py"
@@ -97,7 +96,6 @@ class CIFAR(vision.VisionDataset):
         self.data = np.vstack(self.data).reshape(-1, 3, 32, 32)
         self.data = self.data.transpose((0, 2, 3, 1))
 
-
     def __getitem__(self, idx: int):
         img, target = self.data[idx], self.targets[idx]
 
@@ -109,19 +107,19 @@ class CIFAR(vision.VisionDataset):
 
         return img, target
 
-
     def __len__(self):
         return self.num_samples
 
-
     def get_image_from_idx(self, idx: int = 0):
         return Image.fromarray(self.data[idx])
+
 
 # --------------------------------- YOLOv3 -------------------------------------
 
 help_url = 'https://github.com/ultralytics/yolov3/wiki/Train-Custom-Data'
 img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']  # acceptable image suffixes
 vid_formats = ['mov', 'avi', 'mp4', 'mpg', 'mpeg', 'm4v', 'wmv', 'mkv']  # acceptable video suffixes
+
 
 class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
     def __init__(self, path, img_size=1242, batch_size=16, augment=False,
@@ -244,7 +242,6 @@ class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
                 pbar.desc = f'{prefix}Caching images ({gb / 1E9:.1f}GB)'
             pbar.close()
 
-
     def cache_labels(self, path=Path('./labels.cache'), prefix=''):
         # Cache dataset labels, check images and read shapes
         x = {}  # dict
@@ -295,7 +292,6 @@ class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
             print(f'{prefix}WARNING: No labels found in {path}. See {help_url}')
             # logging.info(f'{prefix}WARNING: No labels found in {path}. See {help_url}')
 
-
         x['hash'] = get_hash(self.label_files + self.img_files)
         x['results'] = nf, nm, ne, nc, i + 1
         x['version'] = 0.2  # cache version
@@ -305,7 +301,6 @@ class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
         except Exception as e:
             logging.info(f'{prefix}WARNING: Cache directory {path.parent} is not writeable: {e}')  # path not writeable
         return x
-
 
     def __len__(self):
         return len(self.img_files)
@@ -398,7 +393,6 @@ class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
         img = img.squeeze(0)
         return img
 
-
     @staticmethod
     def collate_fn(batch):
         img, label, path, shapes = zip(*batch)  # transposed
@@ -431,6 +425,7 @@ class LoadImagesAndLabels(Dataset):  # for KITTI training/testing
             l[:, 0] = i  # add target image index for build_targets()
 
         return torch.stack(img4, 0), torch.cat(label4, 0), path4, shapes4
+
 
 # Ancillary functions --------------------------------------------------------------------------------------------------
 def img2label_paths(img_paths):
@@ -479,6 +474,7 @@ for orientation in ExifTags.TAGS.keys():
     if ExifTags.TAGS[orientation] == 'Orientation':
         break
 
+
 def exif_size(img):
     # Returns exif-corrected PIL size
     s = img.size  # (width, height)
@@ -492,6 +488,7 @@ def exif_size(img):
         pass
 
     return s
+
 
 def load_mosaic(self, index):
     # loads images in a 4-mosaic
@@ -677,6 +674,7 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
     left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
     img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return img, ratio, (dw, dh)
+
 
 def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     r = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain] + 1  # random gains

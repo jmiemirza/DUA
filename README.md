@@ -34,7 +34,7 @@ can be run through the following example commands.
 For running this experiment first download the [AugMix](https://arxiv.org/abs/1912.02781) pre-trained
 [WRN-40-2 Checkpoint](https://drive.google.com/file/d/1wy7gSRsUZzCzj8QhmTbcnwmES_2kkNph/view).
 ```
-python main.py --dataset cifar10 --ckpt_path path/to/checkpoint.pt --data_root root/path/for/cifar-10C
+python main.py --dataset cifar10 --model wrn --ckpt_path path/to/checkpoint.pt --dataroot root/path/for/cifar-10C
 ```
 #### WRN - Results Cifar10C (Level-5 Severity)
 | | data samples used| mean error | gauss_noise | shot_noise | impulse_noise | defocus_blur | glass_blur | motion_blur | zoom_blur | snow | frost |  fog | brightness | contrast | elastic_trans | pixelate | jpeg |
@@ -45,12 +45,12 @@ python main.py --dataset cifar10 --ckpt_path path/to/checkpoint.pt --data_root r
 
 ### ImageNet-C (ResNet-18)
 ```
-python main.py --dataset imagenet --data_root root/path/for/imagenet-c
+python main.py --dataset imagenet --model res18 --dataroot root/path/for/imagenet-C
 ```
 
 ### KITTI (YOLOv3)
 ```
-python main.py --dataset kitti --data_root root/path/for/kitti
+python main.py --dataset kitti --dataroot root/path/for/kitti
 ```
 This will first train the network on the original KITTI dataset and then adapt separately to `Fog` and `Rain`. 
 The current hyper-parameters are set to the default values used in the DUA paper, to experiment with other 

@@ -1,9 +1,8 @@
 import os
 from os.path import join
-
-import numpy as np
 import torch
-
+from pathlib import Path
+import time
 
 # from colorama import Fore
 
@@ -224,6 +223,11 @@ def setup_tiny_imagenet_val_dir(val_dir_path, val_num_imgs=10000, rm_initial=Fal
     if rm_initial:
         os.rmdir(join(val_dir_path, 'images'))
         os.remove(join(val_dir_path, 'val_annotations.txt'))
+
+
+def setup_log_folder(args):
+    Path(args.logfolder).mkdir(exist_ok=True, parents=True)
+    args.logfile = args.logfolder + f'/{time.strftime("%Y%m%d_%H%M%S")}.txt'
 
 
 def kitti_labels_to_yolo(dataroot):
