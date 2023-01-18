@@ -27,7 +27,7 @@ Short explanatory video about DUA is hosted [here](https://www.youtube.com/watch
 Before starting with running the experiments, please prepare the datasets through the instructions listed
 [here](readme/preparing_datasets.md).
 
-We provide code for reproducing CIFAR-10C / ImageNet-C / KITTI. These experiments 
+We provide code for reproducing CIFAR-10C / ImageNet-C / KITTI results. These experiments 
 can be run through the following example commands.  
 
 ### CIFAR-10C (WRN-40-2)
