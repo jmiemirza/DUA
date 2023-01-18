@@ -1,16 +1,20 @@
 import torch
+import torchvision.transforms.functional as TF
 
 
 def tensor_rot_90(x):
-    return x.flip(2).transpose(1, 2)
+    x = TF.rotate(x, 90)
+    return x
 
 
 def tensor_rot_180(x):
-    return x.flip(2).flip(1)
+    x = TF.rotate(x, 180)
+    return x
 
 
 def tensor_rot_270(x):
-    return x.transpose(1, 2).flip(2)
+    x = TF.rotate(x, 270)
+    return x
 
 
 def rotate_batch_with_labels(batch, labels):

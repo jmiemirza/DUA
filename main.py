@@ -1,183 +1,184 @@
-from __future__ import print_function
 import argparse
+import logging.config
+import sys
+import time
 from argparse import Namespace
-import logging
-import torch.optim as optim
-from model import *
-from data_loader import *
+
+import torch
 import torch.backends.cudnn as cudnn
-from tqdm import tqdm
-from PIL import Image
-import torchvision.transforms as transforms
-from utils import *
-from testing import *
+from datetime import datetime
+import methods
+import config
+from init import init_net, init_settings, initial_checks, set_paths
+from utils.results_manager import ResultsManager
+from utils.utils import timedelta_to_str
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='cifar10')
-########################################################################
-parser.add_argument('--depth', default=26, type=int)
-parser.add_argument('--width', default=1, type=int)
-parser.add_argument('--batch_size', default=256, type=int)
-parser.add_argument('--num_samples', default=200, type=int)
-########################################################################
-parser.add_argument('--lr', default=0.1, type=float)
-parser.add_argument('--nepoch', default=150, type=int)
-parser.add_argument('--milestone_1', default=75, type=int)
-parser.add_argument('--milestone_2', default=125, type=int)
-parser.add_argument('--rotation_type', default='rand')
-parser.add_argument('--level', default=5, type=int)
-parser.add_argument('--dua', default=False, type=bool)
-parser.add_argument('--adapt_batch', default=False, type=bool)
-parser.add_argument('--train', default=False, type=bool)
-parser.add_argument('--test_c', default=False, type=bool)
-parser.add_argument('--num_samples_adapt', default=200, type=int)
-parser.add_argument('--group_norm', default=0, type=int)
-########################################################################
-parser.add_argument('--outf', default='.')
-args: Namespace = parser.parse_args()
-my_makedir(args.outf)
-cudnn.benchmark = True
-logger = logging.getLogger(__name__)
 
-##############Please Edit This##############
-args.dataroot = '/media/mirza/Data/Downloads/test-time-training/'
+def main(args):
+    if args.kitti_to_yolo_labels:
+        from utils.utils import kitti_labels_to_yolo
+        kitti_labels_to_yolo(args.kitti_to_yolo_labels)
+        exit()
 
-common_corruptions = [
-    'gaussian_noise', 'shot_noise', 'impulse_noise', 'defocus_blur', 'glass_blur',
-    'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog', 'brightness', 'contrast',
-    'elastic_transform', 'pixelate', 'jpeg_compression'
-]
+    cudnn.benchmark = True
+    start_time = datetime.now()
 
-severity = [5]
+    log.info('------------------------------------ NEW RUN ------------------------------------')
+    log.info(f'Running: {" ".join(sys.argv)}')
+    log.info('Full args list:')
+    for arg in vars(args):
+        log.info(f'{arg}: {getattr(args, arg)}')
+    log.info('---------------------------------------------------------------------------------')
 
-NORM = ((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    results = ResultsManager('mAP@50' if args.dataset == 'kitti' else 'Error')
 
-tr_transform_adapt = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize(*NORM)
-])
+    init_settings(args)
+    if args.usr:
+        set_paths(args)
 
-if args.group_norm == 0:
-    norm_layer = nn.BatchNorm2d
-else:
-    def gn_helper(planes):
-        return nn.GroupNorm(args.group_norm, planes)
+    for run in range(args.num_runs):
+        net = init_net(args)
+        for args.severity_idx in range(args.num_severities):
+            if 'dua' in args.methods:
+                methods.dua(args, net)
 
-net = ResNetCifar(args.depth, args.width, channels=3, classes=10, norm_layer=norm_layer).cuda()
-net = net.cuda()
+            # log results
+            if results.has_results():
+                timestamp_str = time.strftime('%b-%d-%Y_%H%M', time.localtime())
+                results.save_to_file(file_name=f'{timestamp_str}_raw_results.pkl')
+                results.print_summary_latex()
 
-parameters = list(net.parameters())
+                if args.num_runs > 1:
+                    results.reset_results()
+                    log.info(f'{">" * 50} FINISHED RUN #{run + 1} {"<" * 50}')
+                    runtime = datetime.now() - start_time
+                    log.info(f'Runtime so far: {timedelta_to_str(runtime)}')
+                    torch.cuda.empty_cache()
+                    del net
 
-optimizer = optim.SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=5e-4)
-scheduler = torch.optim.lr_scheduler.MultiStepLR(
-    optimizer, [args.milestone_1, args.milestone_2], gamma=0.1, last_epoch=-1)
+    if args.num_runs > 1:
+        results.print_multiple_runs_results()
 
-criterion = nn.CrossEntropyLoss().cuda()
-_, teloader = prepare_test_data(args)
-_, trloader = prepare_train_data(args)
+    runtime = datetime.now() - start_time
+    log.info(f'Execution finished in {timedelta_to_str(runtime)}')
 
-if args.train:
-    all_err_cls = []
-    print('Running...')
-    print('Error (%)\t\ttest')
-    for epoch in range(1, args.nepoch + 1):
-        net.train()
-        for batch_idx, (images, labels) in enumerate(trloader):
-            optimizer.zero_grad()
-            images, labels = images.cuda(), labels.cuda()
-            outputs_cls = net(images)
-            loss = criterion(outputs_cls, labels)
-            loss.backward()
-            optimizer.step()
 
-        err_cls = test(teloader, net)[0]
-        all_err_cls.append(err_cls)
-        scheduler.step()
+# Log uncaught exceptions, that aren't keyboard interrupts
+def handle_exception(exception_type, value, traceback):
+    if issubclass(exception_type, KeyboardInterrupt):
+        sys.__excepthook__(exception_type, value, traceback)
+        return
+    log.exception('Exception occured:', exc_info=(exception_type, value, traceback))
 
-        print(('Epoch %d/%d:' % (epoch, args.nepoch)).ljust(24) +
-              '%.2f' % (err_cls * 100))
 
-        torch.save(all_err_cls, args.outf + '/loss.pth')
+sys.excepthook = handle_exception
 
-        if err_cls <= min(all_err_cls):
-            state = {'err_cls': err_cls,
-                     'net': net.state_dict(),
-                     'optimizer': optimizer.state_dict()}
-            torch.save(state, args.outf + '/ckpt.pth')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
 
-#######ONLY FOR TESTING CORRUPTIONS WITHOUT ADAPTATION#######
-if args.test_c:
-    ckpt = torch.load(args.outf + '/ckpt.pth')
-    error_dict = {}
-    running_mean_list = []
-    running_variance = []
-    net.load_state_dict(ckpt['net'])
-    for index, args.level in enumerate(severity):
-        err = []
-        for corruption in common_corruptions:
-            print(corruption, args.level)
-            args.corruption = corruption
-            args.batch_size = 10000
-            teset, teloader = prepare_test_data(args)
+    parser.add_argument('--usr', default=None, type=str)
+    parser.add_argument('--dataroot', default='path/to/dataroot')
+    parser.add_argument('--ckpt_path', default='path/to/checkpoint.pt')
+    parser.add_argument('--dataset', default='cifar10', choices=['cifar10', 'kitti', 'imagenet-mini', 'imagenet'])
+    parser.add_argument('--model', default=None, type=str, choices=['wrn', 'res26', 'res18', 'yolov3'])
+    parser.add_argument('--logfile', default='log.txt', type=str)
 
-            err_cls = test(teloader, net)[0]
-            print('Error: %.2f' %(err_cls * 100))
+    # General run settings
+    parser.add_argument('--tasks', default=[], type=str, nargs='*',
+                        help='List of tasks to run (in given order), empty means defaults from config.py')
+    parser.add_argument('--scenario', default=['online', 'offline'], type=str, nargs='*',
+                        help='Scenarios to run (online and/or offline)')
+    parser.add_argument('--robustness_severities', default=['5'], type=str, nargs='*')
+    parser.add_argument('--fog_severities', default=['fog_30'], type=str, nargs='*')
+    parser.add_argument('--rain_severities', default=['200mm'], type=str, nargs='*')
+    parser.add_argument('--snow_severities', default=['5'], type=str, nargs='*')
+    parser.add_argument('--checkpoints_path', default='checkpoints', help='path where model checkpoints will be saved')
+    parser.add_argument('--num_runs', default=1, type=int)
+    parser.add_argument('--actmad_save', type=str, default='end',
+                        choices=['each_batch', 'end'],
+                        help='Evaluate and save ActMAD ckpt after each batch or at the end (after all batches)')
+    parser.add_argument('--methods', default=['dua'], type=str, nargs='*',
+                        choices=['dua'],
+                        help='List of methods to run')
 
-#######For Adaptation with DUA#######
-if args.dua:
-    ckpt = torch.load(args.outf + '/ckpt.pth')
-    error_dict = {}
-    running_mean_list = []
-    running_variance = []
-    all_errors = []
-    decay_factor = 0.94
-    min_momentum_constant = 0.005
+    # DUA/DISC adaption
+    parser.add_argument('--num_samples', default=50, type=int)
+    parser.add_argument('--decay_factor', default=0.94, type=float)
+    parser.add_argument('--min_mom', default=0.005, type=float)
+    parser.add_argument('--no_disc_adaption', action='store_true',
+                        help='skip DISC adaption phase (assumes existing BN running estimates checkpoint)')
 
-    for args.level in severity:
-        for args.corruption in common_corruptions:
-            mom_pre = 0.1
-            err = []
-            i = 1
-            print('#######Beginning DUA#######')
-            print(args.corruption, args.level)
+    # Learning & Loading
+    parser.add_argument('--lr', default=0.01, type=float, help='Learning rate for everything except ActMAD')
+    parser.add_argument('--actmad_lr', default=0.0001, type=float, help='Learning rate only applying to ActMAD')
+    parser.add_argument('--initial_task_lr', default=0.01, type=float)
+    parser.add_argument('--epochs', default=150, type=int)
+    parser.add_argument('--batch_size', default=8, type=int)
+    parser.add_argument('--workers', type=int, default=1, help='maximum number of dataloader workers')
+    parser.add_argument('--yolo_lr_adjustment', type=str, default='thirds',
+                        choices=['thirds', 'linear_lr', 'cosine'],
+                        help='how yolov3 training reduces learning rate')
 
-            net.load_state_dict(ckpt['net'])
+    # LR scheduler and early stopping
+    # for yolov3 these setting only apply with yolo_lr_adjustment set to 'thirds',
+    # in which case the reduction by a factor of 3 can also be changed by setting
+    # lr_factor to a different value
+    parser.add_argument('--patience', default=4, type=int)
+    parser.add_argument('--lr_factor', default=1 / 3, type=float)
+    parser.add_argument('--verbose', default=True, type=bool)
+    parser.add_argument('--max_unsuccessful_reductions', default=3, type=int)
 
-            args.batch_size = 10000
-            teset, teloader = prepare_test_data(args)
+    # For creating a val/test set from train set for CIFAR/ImageNet
+    parser.add_argument('--split_ratio', default=0.35, type=float)
+    parser.add_argument('--split_seed', default=42, type=int)
 
-            args.batch_size = 1
-            _, trloader = prepare_train_data(args)
+    # ResNet
+    parser.add_argument('--depth', default=26, type=int)
+    parser.add_argument('--width', default=1, type=int)
+    parser.add_argument('--group_norm', default=0, type=int)
+    parser.add_argument('--rotation_type', default='rand')
 
-            err_cls = test(teloader, net)[0]
-            print('Error Before Adaptation: ', err_cls * 100)
+    # yolov3
+    parser.add_argument('--weights', type=str, default='yolov3.pt', help='initial weights path')
+    parser.add_argument('--cfg', type=str, default='', help='model.yaml path')
+    parser.add_argument('--img_size', nargs='+', type=int, default=[640, 640], help='[train, test] image sizes')
+    parser.add_argument('--rect', action='store_true', help='rectangular training')
+    parser.add_argument('--device', default='3', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--adam', action='store_true', help='use torch.optim.Adam() optimizer')
+    parser.add_argument('--start_disjoint_offline_from_initial', action='store_true',
+                        help='start offline disjoint training from checkpoint trained on initial task')
+    parser.add_argument('--use_freezing_heads_ckpts', action='store_true',
+                        help='Use freezing baseline heads from a previous run. '
+                             'Without this option previously saved heads are moved.')
+    parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
+    parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
+    parser.add_argument('--augment', default=False, action='store_true', help='augmented inference')
+    # yolov3 untested
+    parser.add_argument('--nosave', action='store_true', help='only save final checkpoint')
+    parser.add_argument('--notest', action='store_true', help='only test final epoch')
+    parser.add_argument('--noautoanchor', action='store_true', help='disable autoanchor check')
+    parser.add_argument('--bucket', type=str, default='', help='gsutil bucket')
+    parser.add_argument('--cache_images', action='store_true', help='cache images for faster training')
+    parser.add_argument('--image_weights', action='store_true', help='use weighted image selection for training')
+    parser.add_argument('--multi_scale', action='store_true', help='vary img-size +/- 50%%')
+    parser.add_argument('--single_cls', action='store_true', help='train multi-class data as single-class')
+    parser.add_argument('--sync_bn', action='store_true', help='use SyncBatchNorm, only available in DDP mode')
+    parser.add_argument('--local_rank', type=int, default=-1, help='DDP parameter, do not modify')
+    parser.add_argument('--log_imgs', type=int, default=16, help='number of images for W&B logging, max 100')
+    parser.add_argument('--log_artifacts', action='store_true', help='log artifacts, i.e. final trained model')
+    parser.add_argument('--project', default='runs/train', help='save to project/name')
+    parser.add_argument('--name', default='exp', help='save to project/name')
+    parser.add_argument('--exist_ok', action='store_true', help='existing project/name ok, do not increment')
+    parser.add_argument('--quad', action='store_true', help='quad dataloader')
 
-            for i in tqdm(range(1, args.num_samples + 1)):
-                net.train()
-                image = Image.fromarray(teset.data[i - 1])
-                mom_new = (mom_pre * decay_factor)
-                for m in net.modules():
-                    if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d) or isinstance(m, nn.BatchNorm3d):
-                        m.momentum = mom_new + min_momentum_constant
-                mom_pre = mom_new
-                inputs = [(tr_transform_adapt(image)) for _ in range(64)]
-                inputs = torch.stack(inputs)
-                inputs = inputs.cuda()
-                inputs_ssh, labels_ssh = rotate_batch(inputs, 'rand')
-                inputs_ssh, labels_ssh = inputs_ssh.cuda(), labels_ssh.cuda()
-                outputs_cls = net(inputs_ssh)
-                err_cls = test(teloader, net)[0] * 100
-                err.append(err_cls)
+    # other
+    parser.add_argument('--kitti_to_yolo_labels', default=None, type=str,
+                        help='Generate YOLO style labels from KITTI labels, given original KITTI root dir')
 
-            plot_adaptation_err(err, args.corruption, args)
-            adaptation_error = min(err)
+    args: Namespace = parser.parse_args()
 
-            adaptation_error_min = adaptation_error
-            print('Error After Adaptation: %.2f' % adaptation_error_min)
+    config.LOGGER_CFG['handlers']['file_handler']['filename'] = args.logfile
+    logging.config.dictConfig(config.LOGGER_CFG)
+    log = logging.getLogger('MAIN')
 
-            all_errors.append(adaptation_error_min)
-            print('Mean Error after Adaptation %.2f' % (sum(all_errors) / len(all_errors)))
-            plot_adaptation_err(err, args.corruption, args)
-
+    main(args)
