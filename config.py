@@ -79,7 +79,6 @@ LOGGER_CFG = {
         },
         'MAIN.DISC': {},
         'MAIN.DUA': {},
-        'MAIN.ACTMAD': {},
         'MAIN.DATA': {},
         'MAIN.RESULTS': {},
 

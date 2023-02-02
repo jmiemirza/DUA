@@ -94,9 +94,6 @@ if __name__ == '__main__':
     parser.add_argument('--snow_severities', default=['5'], type=str, nargs='*')
     parser.add_argument('--checkpoints_path', default='checkpoints', help='path where model checkpoints will be saved')
     parser.add_argument('--num_runs', default=1, type=int)
-    parser.add_argument('--actmad_save', type=str, default='end',
-                        choices=['each_batch', 'end'],
-                        help='Evaluate and save ActMAD ckpt after each batch or at the end (after all batches)')
     parser.add_argument('--methods', default=['dua'], type=str, nargs='*',
                         choices=['dua'],
                         help='List of methods to run')
@@ -109,8 +106,7 @@ if __name__ == '__main__':
                         help='skip DISC adaption phase (assumes existing BN running estimates checkpoint)')
 
     # Learning & Loading
-    parser.add_argument('--lr', default=0.01, type=float, help='Learning rate for everything except ActMAD')
-    parser.add_argument('--actmad_lr', default=0.0001, type=float, help='Learning rate only applying to ActMAD')
+    parser.add_argument('--lr', default=0.01, type=float, help='Learning rate for everything except')
     parser.add_argument('--initial_task_lr', default=0.01, type=float)
     parser.add_argument('--epochs', default=150, type=int)
     parser.add_argument('--batch_size', default=8, type=int)
